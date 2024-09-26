@@ -194,37 +194,65 @@ done:
     mov w7, w1                 
     ret
 
-// Funcion atoi
+// Funciones auxiliares: atoi, itoa, parse_operacion
 atoi:
-    mov w1, 0
-atoi_loop:
-    ldrb w2, [x0], 1
-    sub w2, w2, '0'
-    cmp w2, 9
-    bhi atoi_end
-    mov w7, 10
-    mul w1, w1, w7
-    add w1, w1, w2
-    b atoi_loop
-atoi_end:
-    mov w0, w1
-    ret
+    MOV w1, 0                // Inicializar el acumulador
+    MOV w8, 0                // Inicializar w8
 
-// Funcion itoa
+    LDRB w2, [x0], 1         // Cargar el byte y mover el puntero
+    CMP w2, '-'              // Verificar si es un signo negativo
+    BNE ver_negativo          // Si no es negativo, continuar
+    MOV w8, 1                // Guardar el signo como negativo
+    LDRB w2, [x0], 1         // Cargar el siguiente byte y mover el puntero
+
+ver_negativo:
+    SUB w2, w2, '0'          // Convertir el carácter a número
+    CMP w2, 9                // Verificar si es un número (0-9)
+    BHI atoi_end             // Si no es un número, saltar al final
+
+atoi_loop:
+    MOV w3, 10               // Multiplicador (base 10)
+    MUL w1, w1, w3           // Multiplicar el resultado por 10
+    ADD w1, w1, w2           // Sumar el dígito actual al acumulador
+    LDRB w2, [x0], 1         // Cargar el siguiente byte y mover el puntero
+    SUB w2, w2, '0'          // Convertir el carácter a número
+    CMP w2, 9                // Verificar si es un número (0-9)
+    BLS atoi_loop            // Si es un número, repetir el ciclo
+
+atoi_end:
+    CMP w8, 1                // Verificar si es negativo
+    BNE atoi_pos             // Si no es negativo, continuar
+    NEG w1, w1               // Si es negativo, convertir el resultado a negativo
+
+atoi_pos:
+    MOV w0, w1               // Guardar el resultado en w0
+    RET                      // Retornar
+
+// Función ITOA - para convertir números enteros a caracteres ASCII
 itoa:
-    mov w2, 10                 
-    add x1, x1, 11             
-    strb wzr, [x1]             
+    CMP w0, #0              // Verificar si el número es negativo
+    BGE cargar_positivo      // Si es positivo, se obvia la carga del signo
+
+    NEG w0, w0              // Convertir el número a positivo
+    MOV w9, '-'             // Cargar el carácter '-'
+    STRB w9, [x1]           // Escribir el signo en la primera posición
+    ADD x1, x1, 1           // Avanzar el puntero de la cadena
+
+cargar_positivo:
+    MOV w2, 10              // Cargar el divisor (base 10)
+    ADD x1, x1, 11          // Avanzar el puntero de la cadena
+    STRB wzr, [x1]          // Agregar un byte nulo al final de la cadena
 
 itoa_loop:
-    udiv w3, w0, w2            
-    msub w4, w3, w2, w0        
-    add w4, w4, '0'            
-    sub x1, x1, 1              
-    strb w4, [x1]              
-    mov w0, w3                 
-    cbnz w0, itoa_loop         
-    ret
+    UDIV w3, w0, w2         // Dividir w0 entre w2, el resultado en w3 (decenas)
+    MSUB w4, w3, w2, w0     // w4 = w0 - (w3 * w2), calcular el resto (unidades)
+    ADD w4, w4, '0'         // Convertir el dígito de las decenas a ASCII
+    SUB x1, x1, 1           // Retroceder el puntero de la cadena
+    STRB w4, [x1]           // Almacenar el dígito en la cadena
+    MOV w0, w3              // Cargar el resultado de la división
+    CBNZ w0, itoa_loop      // Si w0 no es cero, repetir el ciclo
+
+    RET                     // Retornar
 
 
 check_end:
