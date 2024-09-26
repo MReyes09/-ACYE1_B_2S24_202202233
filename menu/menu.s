@@ -3,6 +3,7 @@
 .extern resta
 .extern multiplicacion
 .extern division
+.extern opMem
 
 .data
 enter:        
@@ -13,20 +14,20 @@ buffer:
     .space 2       // Para almacenar la entrada del usuario
         
 menu_text:
-    .asciz "|| ---------------------------\n"
-    .asciz "||                           \n"
-    .asciz "|| 1. Suma                   \n"
-    .asciz "|| 2. Resta                  \n"
-    .asciz "|| 3. Multiplicacion         \n"
-    .asciz "|| 4. Division               \n"
-    .asciz "|| 5. Calculo con memoria    \n"
-    .asciz "|| 6. Finalizar calculadora  \n"
-    .asciz "||                           \n"
+    .asciz " || ---------------------------\n"
+    .asciz " ||                            \n"
+    .asciz " || 1. Suma                    \n"
+    .asciz " || 2. Resta                   \n"
+    .asciz " || 3. Multiplicacion          \n"
+    .asciz " || 4. Division                \n"
+    .asciz " || 5. Calculo con memoria     \n"
+    .asciz " || 6. Finalizar calculadora   \n"
+    .asciz " ||                            \n"
     .asciz "\n"
 lenMenu = .- menu_text
 
 seleccion_text: 
-    .asciz "|| > Selecciona una opcion: "
+    .asciz " || > Selecciona una opcion: "
 lenSeleccion = .- seleccion_text
 
 resultado: 
@@ -79,7 +80,7 @@ menu:
     cmp w1, '4'                  // Opción 4: División
     beq opcion_division          
     cmp w1, '5'                  // Opción 5: Calculo con memoria
-    beq opcion_memoria           
+    beq opMem           
     cmp w1, '6'                  // Opción 6: Finalizar
     beq finalizar                
 
@@ -87,22 +88,57 @@ menu:
     b menu
 
 opcion_suma:
+    // Limpiar buffer antes de llamar a la función suma
+    mov x0, 0                    // stdin
+    ldr x1, =buffer              // dirección del buffer
+    mov x2, 2                    // leer 2 bytes para incluir el '\n'
+    mov x8, 63                   // syscall para leer
+    svc 0
+
     beq suma                      // Llamar a la función suma
-    b menu                       // Regresar al menú después de la suma
+    b menu                        // Regresar al menú después de la suma
 
 opcion_resta:
+    // Limpiar buffer antes de llamar a la función suma
+    mov x0, 0                    // stdin
+    ldr x1, =buffer              // dirección del buffer
+    mov x2, 2                    // leer 2 bytes para incluir el '\n'
+    mov x8, 63                   // syscall para leer
+    svc 0
+    
     beq resta
     b menu
 
 opcion_multiplicacion:
+    // Limpiar buffer antes de llamar a la función suma
+    mov x0, 0                    // stdin
+    ldr x1, =buffer              // dirección del buffer
+    mov x2, 2                    // leer 2 bytes para incluir el '\n'
+    mov x8, 63                   // syscall para leer
+    svc 0
+
     beq multiplicacion
     b menu
 
 opcion_division:
+    // Limpiar buffer antes de llamar a la función suma
+    mov x0, 0                    // stdin
+    ldr x1, =buffer              // dirección del buffer
+    mov x2, 2                    // leer 2 bytes para incluir el '\n'
+    mov x8, 63                   // syscall para leer
+    svc 0
+
     beq division
     b menu
 
 opcion_memoria:
+    // Limpiar buffer antes de llamar a la función suma
+    mov x0, 0                    // stdin
+    ldr x1, =buffer              // dirección del buffer
+    mov x2, 2                    // leer 2 bytes para incluir el '\n'
+    mov x8, 63                   // syscall para leer
+    svc 0
+    
      b menu
 
 finalizar:

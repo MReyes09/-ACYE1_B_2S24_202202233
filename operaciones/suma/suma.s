@@ -1,20 +1,36 @@
-
-
 .global suma
 
 .data
+menu_text:
+    .asciz " || ----------------------------- \n"
+    .asciz " ||                               \n"
+    .asciz " || 1. Separados por Coma         \n"
+    .asciz " || 2. Ingresar Numero por numero \n"
+    .asciz " || \n"
+    .asciz " || ----------------------------- \n"
+    .asciz "\n"
+    .asciz " || > Ingrese respuesta:  "
 
-msg1:
-    .ascii "|| > Ingrese el primer valor: "
-    lenMsg1 = .- msg1
-msg2:
-    .ascii "|| > ngrese el segundo valor: "
-    lenMsg2 = .- msg2
+    lenmenu_text = .- menu_text
+
+valoresComa:
+    .ascii " || >Ingrese valores separados por coma: "
+    lenvaloresComa = .- valoresComa
+
 resultado:
-    .ascii "|| La suma es: "
+    .ascii " || La suma es: "
     lenResultado = .- resultado
-     input_BuffUser: .skip 1
 
+valor1:
+    .ascii " || > Ingrese el primer valor: "
+    lenvalor1 = .- valor1
+
+valor2:
+    .ascii " || > Ingrese el segundo valor: "
+    lenvalor2 = .- valor2
+
+inputOperacion:
+    .space 16
 input1:
     .space 10
 input2:
@@ -24,114 +40,226 @@ result:
 newline:
     .ascii "\n"
 
+.bss
+opcion:
+    .space 5
+
 .text
-            // retornar
+.macro read reg, len
+    MOV x0, 0
+    LDR x1, =\reg
+    MOV x2, \len
+    MOV x8, 63
+    SVC 0
+.endm
+
 suma:
-    // Leer entrada del usuario (esperar Enter)
+    // Mostrar menú
+    mov x0, 1
+    ldr x1, =menu_text
+    mov x2, lenmenu_text
+    mov x8, 64
+    svc 0
+
+    // Leer selección del usuario
     mov x0, 0
-    ldr x1, =input_BuffUser
-    mov x2, 16                // Leer hasta 16 bytes (suficiente para capturar 'Enter')
+    ldr x1, =input1
+    mov x2, 2
     mov x8, 63
     svc 0
-    // Mostrar mensaje
-    mov x0, 1         // stdout
-    ldr x1, =msg1      // cargar mensaje
-    mov x2, lenMsg1    // tamaño mensaje
-    mov x8, 64        // syscall write
-    svc 0             // llamada al sistema
 
-    // Leer primer número
-    mov x0, 0         // stdin
-    ldr x1, =input1   // cargar input1
-    mov x2, 10        // tamaño input1
-    mov x8, 63        // syscall read
-    svc 0             // llamada al sistema
+    // Comprobar selección
+    ldrb w0, [x1]
+    cmp w0, '1'
+    beq sumaComa
+    cmp w0, '2'
+    beq sumaUnoPorUno
 
-    // Mostrar mensaje
-    mov x0, 1         // stdout
-    ldr x1, =msg2      // cargar mensaje
-    mov x2, lenMsg2    // tamaño mensaje
-    mov x8, 64        // syscall write
-    svc 0             // llamada al sistema
-    // Leer segundo número
-    mov x0, 0         // stdin
-    ldr x1, =input2   // cargar input2
-    mov x2, 10        // tamaño input2
-    mov x8, 63        // syscall read
-    svc 0             // llamada al sistema
+    // Si la entrada no es válida, repetir menú
+    b suma
 
-    // Convertir input1 a entero (atoi)
-    ldr x0, =input1   // cargar input1
-    bl atoi           // llamar a atoi
-    mov w5, w0        // guardar resultado en w5
+sumaComa:
+    // Mostrar mensaje de solicitud
+    mov x0, 1
+    ldr x1, =valoresComa
+    mov x2, lenvaloresComa
+    mov x8, 64
+    svc 0
 
-    // Convertir input2 a entero (atoi)
-    ldr x0, =input2   // cargar input2
-    bl atoi           // llamar a atoi
-    mov w6, w0        // guardar resultado en w6
+    // Leer la operación completa (5,5, por ejemplo)
+    mov x0, 0
+    ldr x1, =inputOperacion
+    mov x2, 16
+    mov x8, 63
+    svc 0
+
+    // Parsear la operación
+    ldr x0, =inputOperacion
+    bl parse_operacion
 
     // Sumar los dos números
-    add w7, w5, w6    // w7 = w5 + w6
+    add w7, w5, w6
 
-    // Convertir resultado a cadena (itoa)
-    mov w0, w7        // cargar resultado
-    ldr x1, =result   // cargar dirección de resultado
-    bl itoa           // llamar a itoa
-
-    // Mostrar mensaje
-    mov x0, 1         // stdout
-    ldr x1, =resultado      // cargar mensaje
-    mov x2, lenResultado    // tamaño mensaje
-    mov x8, 64        // syscall write
-    svc 0             // llamada al sistema
+    // Convertir resultado a cadena
+    mov w0, w7
+    ldr x1, =result
+    bl itoa
 
     // Mostrar resultado
-    mov x0, 1         // stdout
-    ldr x1, =result   // cargar resultado
-    mov x2, 12        // tamaño resultado
-    mov x8, 64        // syscall write
-    svc 0             // llamada al sistema
+    mov x0, 1
+    ldr x1, =resultado
+    mov x2, lenResultado
+    mov x8, 64
+    svc 0
 
-    // Mostrar nueva línea
-    mov x0, 1         // stdout
-    ldr x1, =newline  // cargar nueva línea
-    mov x2, 1         // tamaño nueva línea
-    mov x8, 64        // syscall write
-    svc 0             // llamada al sistema
+    mov x0, 1
+    ldr x1, =result
+    mov x2, 12
+    mov x8, 64
+    svc 0
 
-    // Salir del programa
-  //mov x8, 93        // syscall exit
-  //svc 0             // llamada al sistema
-  b menu  
+    mov x0, 1
+    ldr x1, =newline
+    mov x2, 1
+    mov x8, 64
+    svc 0
 
-// Función atoi: convierte cadena a entero
+    read opcion, 1
+
+    b menu
+
+sumaUnoPorUno:
+    // Mostrar mensaje para el primer valor
+    mov x0, 1
+    ldr x1, =valor1
+    mov x2, lenvalor1
+    mov x8, 64
+    svc 0
+
+    // Leer primer valor
+    mov x0, 0
+    ldr x1, =input1
+    mov x2, 10
+    mov x8, 63
+    svc 0
+
+    // Mostrar mensaje para el segundo valor
+    mov x0, 1
+    ldr x1, =valor2
+    mov x2, lenvalor2
+    mov x8, 64
+    svc 0
+
+    // Leer segundo valor
+    mov x0, 0
+    ldr x1, =input2
+    mov x2, 10
+    mov x8, 63
+    svc 0
+
+    // Convertir entradas a enteros
+    ldr x0, =input1
+    bl atoi
+    mov w5, w0
+
+    ldr x0, =input2
+    bl atoi
+    mov w6, w0
+
+    // Sumar los dos números
+    add w7, w5, w6
+
+    // Convertir resultado a cadena
+    mov w0, w7
+    ldr x1, =result
+    bl itoa
+
+    // Mostrar resultado
+    mov x0, 1
+    ldr x1, =resultado
+    mov x2, lenResultado
+    mov x8, 64
+    svc 0
+
+    mov x0, 1
+    ldr x1, =result
+    mov x2, 12
+    mov x8, 64
+    svc 0
+
+    mov x0, 1
+    ldr x1, =newline
+    mov x2, 1
+    mov x8, 64
+    svc 0
+
+    read opcion, 1
+
+    b menu
+
+// Funciones auxiliares: atoi, itoa, parse_operacion
 atoi:
-    mov w1, 0         // resultado
+    mov w1, 0
 atoi_loop:
-    ldrb w2, [x0], 1  // cargar byte y avanzar
-    sub w2, w2, '0'   // convertir a número
-    cmp w2, 9         // verificar si es número
-    bhi atoi_end      // si no es, salimos
-    mov w3, 10        // multiplicador
-    mul w1, w1, w3    // multiplicar resultado por 10
-    add w1, w1, w2    // sumar dígito
-    b atoi_loop       // repetir
+    ldrb w2, [x0], 1
+    sub w2, w2, '0'
+    cmp w2, 9
+    bhi atoi_end
+    mov w3, 10
+    mul w1, w1, w3
+    add w1, w1, w2
+    b atoi_loop
 atoi_end:
-    mov w0, w1        // mover resultado a w0
-    ret               // retornar
+    mov w0, w1
+    ret
 
-// Función itoa: convierte entero a cadena
 itoa:
-    mov w2, 10        // base 10
-    add x1, x1, 11    // mover puntero al final
-    strb wzr, [x1]    // agregar terminador nulo
+    mov w2, 10
+    add x1, x1, 11
+    strb wzr, [x1]
 itoa_loop:
-    udiv w3, w0, w2   // dividir número por 10
-    msub w4, w3, w2, w0 // obtener residuo
-    add w4, w4, '0'   // convertir a carácter
-    sub x1, x1, 1     // retroceder puntero
-    strb w4, [x1]     // almacenar carácter
-    mov w0, w3        // actualizar número
-    cbnz w0, itoa_loop// repetir mientras no sea cero
-    ret       
+    udiv w3, w0, w2
+    msub w4, w3, w2, w0
+    add w4, w4, '0'
+    sub x1, x1, 1
+    strb w4, [x1]
+    mov w0, w3
+    cbnz w0, itoa_loop
+    ret
+
+parse_operacion:
+    mov w1, 0
+    mov w2, 0
+    mov w3, 0
+parse_loop:
+    ldrb w4, [x0], 1
+    cmp w4, ','
+    beq parse_after_comma
+    cmp w4, 0
+    beq parse_end
+    cmp w3, 0
+    bne parse_second_number
+    sub w4, w4, '0'
+    cmp w4, 9
+    bhi parse_loop
+    mov w5, 10
+    mul w1, w1, w5
+    add w1, w1, w4
+    b parse_loop
+parse_after_comma:
+    mov w3, 1
+    b parse_loop
+parse_second_number:
+    sub w4, w4, '0'
+    cmp w4, 9
+    bhi parse_loop
+    mov w5, 10
+    mul w2, w2, w5
+    add w2, w2, w4
+    b parse_loop
+parse_end:
+    mov w5, w1
+    mov w6, w2
+    ret
 ret
+
