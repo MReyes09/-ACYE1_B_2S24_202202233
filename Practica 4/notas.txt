@@ -1,0 +1,19 @@
+aarch64-linux-gnu-as -o encabezado.o encabezado.s
+
+aarch64-linux-gnu-as -o main.o main.s
+
+aarch64-linux-gnu-as -o menu.o menu.s
+
+aarch64-linux-gnu-as -o division.o division.s
+
+aarch64-linux-gnu-as -o opMem.o opMem.s
+
+aarch64-linux-gnu-as -o multiplicacion.o multiplicacion.s
+
+aarch64-linux-gnu-as -o resta.o resta.s
+
+aarch64-linux-gnu-as -o suma.o suma.s
+
+aarch64-linux-gnu-ld -o practica main/main.o encabezado/encabezado.o menu/menu.o
+
+qemu-aarch64 ./practica
