@@ -1,19 +1,14 @@
-aarch64-linux-gnu-as -o encabezado.o encabezado.s
-
-aarch64-linux-gnu-as -o main.o main.s
-
-aarch64-linux-gnu-as -o menu.o menu.s
-
-aarch64-linux-gnu-as -o division.o division.s
-
-aarch64-linux-gnu-as -o opMem.o opMem.s
-
-aarch64-linux-gnu-as -o multiplicacion.o multiplicacion.s
-
-aarch64-linux-gnu-as -o resta.o resta.s
-
-aarch64-linux-gnu-as -o suma.o suma.s
-
-aarch64-linux-gnu-ld -o practica main/main.o encabezado/encabezado.o menu/menu.o
-
+cd /home/mati/ARM64/ACYE1_B_2S24_202202233
+aarch64-linux-gnu-as -o encabezado/encabezado.o encabezado/encabezado.s
+aarch64-linux-gnu-as -o main/main.o main/main.s
+aarch64-linux-gnu-as -o menu/menu.o menu/menu.s
+aarch64-linux-gnu-as -o operaciones/lecturaCSV/lectura.o operaciones/lecturaCSV/lectura.s
+aarch64-linux-gnu-as -o operaciones/lecturaCSV/lecturaArchivo.o operaciones/lecturaCSV/lecturaArchivo.s
+aarch64-linux-gnu-ld -o practica main/main.o encabezado/encabezado.o menu/menu.o operaciones/lecturaCSV/lectura.o operaciones/lecturaCSV/lecturaArchivo.o
 qemu-aarch64 ./practica
+
+qemu-aarch64 -g 12345 ./practica
+
+gdb-multiarch -q --nh -ex 'set architecture aarch64' -ex 'file $practica' -ex 'target remote localhost:12345' -ex 'layout split' -ex 'layout regs';
+
+stepi
