@@ -2,9 +2,10 @@ cd /home/mati/ARM64/ACYE1_B_2S24_202202233
 aarch64-linux-gnu-as -o encabezado/encabezado.o encabezado/encabezado.s
 aarch64-linux-gnu-as -o main/main.o main/main.s
 aarch64-linux-gnu-as -o menu/menu.o menu/menu.s
-aarch64-linux-gnu-as -o operaciones/lecturaCSV/lectura.o operaciones/lecturaCSV/lectura.s
+aarch64-linux-gnu-as -o operaciones/BubbleSort/bubbleSort.o operaciones/BubbleSort/bubbleSort.s
+aarch64-linux-gnu-as -o operaciones/lecturaCSV/lectura.o operaciones/lecturaCSV/lectura.s 
 aarch64-linux-gnu-as -o operaciones/lecturaCSV/lecturaArchivo.o operaciones/lecturaCSV/lecturaArchivo.s
-aarch64-linux-gnu-ld -o practica main/main.o encabezado/encabezado.o menu/menu.o operaciones/lecturaCSV/lectura.o operaciones/lecturaCSV/lecturaArchivo.o
+aarch64-linux-gnu-ld -o practica main/main.o encabezado/encabezado.o menu/menu.o operaciones/lecturaCSV/lectura.o operaciones/lecturaCSV/lecturaArchivo.o operaciones/BubbleSort/bubbleSort.o
 qemu-aarch64 ./practica
 
 qemu-aarch64 -g 12345 ./practica
@@ -12,3 +13,90 @@ qemu-aarch64 -g 12345 ./practica
 gdb-multiarch -q --nh -ex 'set architecture aarch64' -ex 'file $practica' -ex 'target remote localhost:12345' -ex 'layout split' -ex 'layout regs';
 
 stepi
+
+bubblesort:
+
+    print arrayinicial, lenArrayInicial
+
+    BL imprimir_array // se llama a la funcion para imprimir el array
+
+    LDR x20, =length // se carga la direccion de memoria de length en x20
+    LDR x20, [x20]// se carga el valor de length en x20
+
+    MOV x21, 0 // se carga el valor 0 en x21, se usara como i
+    SUB x20, x20, 1 // se decrementa la longitud en 1
+
+    LDR x16, =formaordenamiento // se carga la direccion de memoria de formaordenamiento en x16
+    LDR w16, [x16]// se carga el valor de formaordenamiento en w16
+
+    LDR x12, =stepbystep         // se carga la direccion de memoria de stepbystep en x12
+    LDR w8, [x12]                // se carga el valor de stepbystep en w12
+
+    MOV x17, 0 // se usara como contadora de iteraciones
+
+    B bubblesort_loop
+
+bubblesort_loop:
+
+    MOV x9, 0 // se carga el valor 0 en x9, se usara como j
+    SUB x19, x20, x21 // se resta la longitud con i (length - 1 - i)
+
+bubblesort_innerloop:
+
+    LDR x3, =arrayordenado // se carga la direccion de memoria de arrayordenado en x3
+    LDR w4, [x3, x9, LSL2]      // se carga el valor de array[j] en w4
+    ADD x9, x9, 1               // se incrementa j
+    LDR w5, [x3, x9, LSL2]      // se carga el valor de array[j + 1] en w5
+
+    // orden ascendente
+    CBNZ w16, bubblesort_ascendente // se compara si es 1, para ordenar de forma ascendente
+
+    // orden descendente
+    CMP w4, w5 // se compara si array[j] es mayor que array[j + 1]
+    BGT bubblesort_cmp // si es menor, se envia a comparar para continuar con el ciclo
+
+    B bubblesort_intercambio
+
+bubblesort_ascendente:
+
+    CMP w4, w5                // se compara si array[j] es menor que array[j + 1]
+    BLT bubblesort_cmp        // si es mayor, se envia a comparar para continuar con el ciclo
+
+bubblesort_intercambio:
+
+    STR w4, [x3, x9, LSL2]      // se guarda el valor de array[j] en array[j + 1]
+    SUB x9, x9, 1               // se decrementa j
+    STR w5, [x3, x9, LSL2]      // se guarda el valor de array[j + 1] en array[j]
+    ADD x9, x9, 1               // se incrementa j
+
+    CBZ w8, bubblesort_cmp // si es 0, se envia a comparar para continuar con el ciclo
+
+    print numeroiteracion, lenNumeroIteracion
+
+    ADD x17, x17, #1 // se incrementa la contadora de iteraciones
+    MOV w0, w17 // se carga el valor de la contadora de iteraciones en w0
+    LDR x1, =numero // se carga la direccion de memoria de numero en x1
+
+    BL itoa // se llama a la funcion itoa para convertir el numero a ASCII
+
+    print dospuntos, lenDosPuntos
+
+    BL imprimir_array // se llama a la funcion para imprimir el array
+
+    B bubblesort_cmp
+
+bubblesort_cmp:
+
+    CMP x9, x19 // se compara si j es igual a i
+    BNE bubblesort_innerloop // si no es igual, se repite el ciclo
+
+    ADD x21, x21, 1 // se incrementa i
+    CMP x21, x20 // se compara si i es igual a length - 1
+    BNE bubblesort_loop // si no es igual, se repite el ciclo
+
+    print arrayfinal, lenArregloOrdenado
+
+    BL imprimir_array // se llama a la funcion para imprimir el array
+
+    B cont
+    

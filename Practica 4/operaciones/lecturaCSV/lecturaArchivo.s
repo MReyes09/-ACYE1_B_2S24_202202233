@@ -63,9 +63,6 @@ fileDescriptor:
 opcion:
     .space 2
 
-num:
-    .space 12
-
 character:
     .byte 0
 

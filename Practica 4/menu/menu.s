@@ -1,7 +1,9 @@
 .global menu
 .global array
 .global count
+.global num
 .extern lectura
+.extern menuBubble
 
 .data
 
@@ -43,6 +45,7 @@ lenSeleccion = .- seleccion_text
 clear_screen:   
     .asciz "\033[2J\033[H"  // Código ANSI para limpiar pantalla
 
+.bss
 //-------------------------------------------------------------------------
 //Declaracion de variables
 buffer: 
@@ -56,6 +59,9 @@ array:
     .space 1024 // array de 100 enteros de 4 bytes cada uno
 
 num:
+    .space 12
+
+numero:
     .space 12
 //-------------------------------------------------------------------------
 
@@ -216,8 +222,10 @@ opcion_BubbleSort:
     mov x8, 63                   // syscall para leer
     svc 0
 
-    // Llamar a la función resta
+    beq menuBubble       // Llamar a la función menuBubble
+
     b menu
+
 
 opcion_QuickSort:
     // Limpiar buffer antes de llamar a la función multiplicación
@@ -251,3 +259,4 @@ opcion_MergeSort:
 
     // Llamar a la función modulo
     b menu
+
