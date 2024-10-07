@@ -34,14 +34,6 @@ Este algoritmo se denomina de ordenación por comparación en el lugar porque or
         .asciz " || > Selecciona una opcion: "
         lenOpcion = .- msgOpcion
 
-    sumaComas:
-        .asciz "...Ingresando Ordenamiento de manera Acendente...\n"
-        lenMultiplicacionText = . - sumaComas
-
-    cargacsv:
-        .asciz "...Ingresando Ordenamiento de manera Decendente...\n"
-        lencargacsv = . - cargacsv
-
     erronea:
         .asciz " || Opción no válida, intenta de nuevo..."
         lenErronea = . - erronea
@@ -73,11 +65,11 @@ Este algoritmo se denomina de ordenación por comparación en el lugar porque or
         lennewline = . - newline
 
     resulta:
-        .asciz "\nResultado: "
+        .asciz " || Arreglo ordenado: "
         lenResultado = . - resulta
 
     pasosim:
-        .asciz "\nPaso "
+        .asciz " || No. Paso: "
         lenpasosim = . -pasosim
 
     dospuntos:
@@ -85,7 +77,7 @@ Este algoritmo se denomina de ordenación por comparación en el lugar porque or
         lendospuntos = . - dospuntos
     
     conjInicial: 
-        .asciz "\nConjunto inicial: "
+        .asciz " || Arreglo base: "
         lenconjInicial = . - conjInicial
 
 
@@ -167,7 +159,6 @@ do_InsertionSort:
 
         acendente:
             bl copy_array2
-            print sumaComas, lenMultiplicacionText
             //beq opcion_separados 
             
             print visualizar, lenvisualizar              
@@ -185,18 +176,17 @@ do_InsertionSort:
 
         decendente:
             bl copy_array2
-            print cargacsv, lencargacsv
             // Imprimir mensaje para ingresar el nombre del archivo
             print visualizar, lenvisualizar              
             read 0, opcion, 2
             LDR x10, =opcion
             LDRB w10, [x10]
 
-            //cmp w10,48
-            //beq no_visualizar1
+            cmp w10, '2'
+            beq no_visualizar1
 
-            //cmp w10,49
-            //beq bubbleSort_desendenteConPasos
+            cmp w10, '1'
+            beq insertionSort_ConPasos4
             
             b invalido
         cont:
@@ -355,6 +345,143 @@ insertionSort_ConPasos:
         read 0, filename, 50
         b menuS
 
+//Imprimir descendente
+
+no_visualizar1:
+    ldr x0, =array
+    ldr x1, =count
+    ldr x1, [x1]
+    //sub x1,x1,1
+    bl insertionSortA1
+    
+    // recorrer array y convertir a ascii
+    LDR x9, =count
+    LDR x9, [x9] // length => cantidad de numeros leidos del csv
+    MOV x7, 0
+    LDR x15, =array
+
+    print resulta, lenResultado
+    loop_array2:
+        LDR w0, [x15], 4
+        LDR x1, =num
+        BL itoa
+
+        print num, x10
+        print espacio, lenEspacio
+
+        ADD x7, x7, 1
+        CMP x9, x7
+        BNE loop_array2
+
+    print newline, lennewline
+    print precionarEnter, lenPrecionarEnter
+    read 0, filename, 50
+    b menuS
+
+insertionSortA1:
+    STP X29, X30, [SP, -16]!     // Guardar Frame Pointer y Link Register en la pila
+    MOV X29, SP                   // Establecer el Frame Pointer al puntero de la pila
+    // x0 <- &array (a)
+    // x1 <- count = longitud (n)
+    MOV X2, #1                    // i = 1
+
+    iloop3:
+        CMP X2, X1                    // Comparar i con n
+        BGE iloopend3                  // Si i >= n, salir del bucle
+
+        ADD X10, X0, X2, LSL #2       // Cargar el valor de array[i] en temp
+        LDR W10, [X10]                // temp = array[i]
+        
+        SUB X3, X2, #1                // j = i - 1
+
+    jloop3:
+        CMP X3, #0                    // Comparar j con 0
+        BLT jloopend3                  // Si j < 0, salir del bucle
+
+        ADD X9, X0, X3, LSL #2        // Cargar array[j] en x9
+        LDR W9, [X9]                  // x9 = array[j]
+        
+        CMP W10, W9                   // Comparar temp con array[j]
+        //cambiar a BLE para ser decendente
+        BLE jloopend3                  // Si temp >= array[j], salir del bucle
+
+        ADD X8, X0, X3, LSL #2        // x8 = &array[j+1]
+        ADD X8, X8, #4                // Desplazar x8 a array[j+1]
+        STR W9, [X8]                  // Mover array[j] a array[j+1]
+
+        SUB X3, X3, #1                // j = j - 1
+        B jloop3                       // Volver al inicio del bucle jloop
+
+    jloopend3:
+        ADD X3, X3, #1                // j = j + 1
+        ADD X8, X0, X3, LSL #2        // x8 = &array[j]
+        STR W10, [X8]                 // Guardar temp en array[j]
+
+        ADD X2, X2, #1                // i++
+        B iloop3                       // Volver al inicio del bucle iloop
+
+    iloopend3:
+        LDP X29, X30, [SP], #16      // Restaurar Frame Pointer y Link Register desde la pila
+        RET                            // Retornar de la función
+
+insertionSort_ConPasos4:
+    MOV x11, 0                      // Inicializar contador
+    bl print_array           // Llamar a la rutina para imprimir el arreglo
+
+    ldr x0, =array
+    ldr x1, =count
+    ldr x1, [x1]
+
+    STP x29, x30, [SP, -16]!     // Guardar Frame Pointer y Link Register en la pila
+    MOV x29, SP                   // Establecer el Frame Pointer al puntero de la pila
+    // x0 <- &array (a)
+    // x1 <- count = longitud (n)
+    MOV x2, #1                    // i = 1
+
+    iloop4:
+        CMP x2, x1                    // Comparar i con n
+        BGE iloopend4                  // Si i >= n, salir del bucle
+
+        ADD x10, x0, x2, LSL #2       // Cargar el valor de array[i] en temp
+        LDR w10, [x10]                // temp = array[i]
+        
+        SUB x3, x2, #1                // j = i - 1
+
+    jloop4:
+        CMP x3, #0                    // Comparar j con 0
+        BLT jloopend4                  // Si j < 0, salir del bucle
+
+        ADD x9, x0, x3, LSL #2        // Cargar array[j] en x9
+        LDR w9, [x9]                  // x9 = array[j]
+        
+        CMP w10, w9                   // Comparar temp con array[j]
+        BLE jloopend4                  // Si temp >= array[j], salir del bucle
+
+        ADD x8, x0, x3, LSL #2        // x8 = &array[j+1]
+        ADD x8, x8, #4                // Desplazar x8 a array[j+1]
+        STR w9, [x8]                  // Mover array[j] a array[j+1]
+
+        SUB x3, x3, #1                // j = j - 1
+        B jloop4                       // Volver al inicio del bucle jloop
+
+    jloopend4:
+        ADD x3, x3, #1                // j = j + 1
+        ADD x8, x0, x3, LSL #2        // x8 = &array[j]
+        STR w10, [x8]                 // Guardar temp en array[j]
+
+        ADD x11, x11 , 1 //x11 ++
+        BL print_array                // Imprimir el arreglo después de cada cambio
+
+        ADD x2, x2, #1                // i++
+        B iloop4                       // Volver al inicio del bucle iloop
+
+    iloopend4:
+        LDP x29, x30, [SP], #16      // Restaurar Frame Pointer y Link Register desde la pila
+        print newline, lennewline
+        print precionarEnter, lenPrecionarEnter
+        read 0, filename, 50
+        b menuS
+
 
 print_array:
     STP x29, x30, [sp, #-16]!      // Guardar Frame Pointer (x29) y Link Register (x30)
@@ -384,7 +511,7 @@ print_array:
     inciando:
         print conjInicial, lenconjInicial
 
-    loop_array2:
+    loop_array10:
         LDR w0, [x15], 4               // Cargar siguiente valor del array (elemento de 32 bits)
         LDR x1, =num                   // Apuntar el buffer a la cadena "num"
 
@@ -394,7 +521,7 @@ print_array:
 
         ADD x7, x7, 1                  // Incrementar el contador
         CMP x14, x7                    // Comparar el contador con el número total
-        BNE loop_array2                // Si no se ha terminado, repetir
+        BNE loop_array10                // Si no se ha terminado, repetir
 
         // Imprimir nueva línea
     print newline, lennewline
