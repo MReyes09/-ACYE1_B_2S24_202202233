@@ -295,9 +295,11 @@ bubblesort_loop:
         CBZ w8, bubblesort_cmp // si es 0, se envia a comparar para continuar con el ciclo
 
         print 1, numeroiteracion, lenNumeroIteracion
-        print 1, numero, x17 // se imprime el numero
 
-        ADD x17, x17, #1 // se incrementa la contadora de iteraciones
+        ADD x17, x17, 1 // se incrementa la contadora de iteraciones
+
+        print 1, numero, x17 // se imprime el numero
+        
         MOV w0, w17 // se carga el valor de la contadora de iteraciones en w0
         LDR x1, =numero // se carga la direccion de memoria de numero en x1
 

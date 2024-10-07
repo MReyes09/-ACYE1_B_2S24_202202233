@@ -1,5 +1,6 @@
 .global lectura
 .extern menu_LecturaArchivo
+.extern lecturaConsola
 
 .section .data
 menu_msg:       
@@ -10,7 +11,6 @@ menu_msg:
     .asciz  " || 3. Regresar                                             \n"
     .asciz  " || ------------------------------------------------------  \n"
     .asciz  " || Ingrese el numero: "
-    .asciz  "\n"
 menu_msg_len = . - menu_msg
 
 invalid_option: 
@@ -38,6 +38,15 @@ lectura:
     SVC #0                          // Llamada al sistema
 
 menu_lectura_loop:                    // Llamada al sistema
+
+    // Reiniciamos el tamaño del array
+    Mov x3, #0
+    LDR X2, =count
+    STR x3, [x2]
+
+    Mov x3, #0
+    LDR X2, =num
+    STR x3, [x2]
 
     MOV X0, #1                      // File descriptor (stdout)
     LDR X1, =menu_msg               // Mostrar el mensaje del menú
@@ -72,19 +81,8 @@ menu_lectura_loop:                    // Llamada al sistema
     B menu_lectura_loop                     // Volver al menú
 
 opcion_manual:
-    MOV X0, #1                      // File descriptor (stdout)
-    LDR X1, =clear_screen           // Limpiar la pantalla
-    MOV X2, #7                      // Longitud del comando ANSI
-    MOV X8, #64                     // sys_write syscall
-    SVC #0                          // Llamada al sistema
 
-    // Mensaje de opción manual seleccionada
-    MOV X0, #1
-    LDR X1, =manual_msg
-    MOV X2, #manual_msg_len
-    MOV X8, #64
-    SVC #0
-    B menu_lectura_loop                     // Volver al menú
+    BEQ lecturaConsola                     // Volver al menú
 
 opcion_csv:
     MOV X0, #1                      // File descriptor (stdout)

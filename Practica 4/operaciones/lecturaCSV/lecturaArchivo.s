@@ -94,6 +94,11 @@ getFilename:
     print 1, subMenu_msg, lenMenu   // Mostrar mensaje de subMenu
     print 1, File_msg, lenFile      // Mostrar mensaje de File_msg
     read 0, file_Path, 50           // Recibe la ruta del archivo
+    
+    // Reiniciamos el tamaño del array
+    Mov x3, #0
+    LDR X2, =num
+    STR x3, [x2]
 
     // Agregar caracter nulo al final del nombre del archivo
     LDR x0, =file_Path

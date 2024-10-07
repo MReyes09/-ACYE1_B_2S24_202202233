@@ -2,8 +2,10 @@
 .global array
 .global count
 .global num
+.global ingreso_array
 .extern lectura
 .extern menuBubble
+.extern do_InsertionSort
 
 .data
 
@@ -63,6 +65,9 @@ num:
 
 numero:
     .space 12
+
+ingreso_array: // Booleana para saber si ya ingreso algun array para ordenar
+    .space 12, 0
 //-------------------------------------------------------------------------
 
 .text
@@ -245,6 +250,8 @@ opcion_InsertionSort:
     mov x2, 2                    // leer 2 bytes para incluir el '\n'
     mov x8, 63                   // syscall para leer
     svc 0
+
+    beq do_InsertionSort
 
     // Llamar a la función división
     b menu

@@ -3,9 +3,11 @@ aarch64-linux-gnu-as -o encabezado/encabezado.o encabezado/encabezado.s
 aarch64-linux-gnu-as -o main/main.o main/main.s
 aarch64-linux-gnu-as -o menu/menu.o menu/menu.s
 aarch64-linux-gnu-as -o operaciones/BubbleSort/bubbleSort.o operaciones/BubbleSort/bubbleSort.s
+aarch64-linux-gnu-as -o operaciones/InsertationSort/insertioSort.o operaciones/InsertationSort/insertioSort.s
 aarch64-linux-gnu-as -o operaciones/lecturaCSV/lectura.o operaciones/lecturaCSV/lectura.s 
 aarch64-linux-gnu-as -o operaciones/lecturaCSV/lecturaArchivo.o operaciones/lecturaCSV/lecturaArchivo.s
-aarch64-linux-gnu-ld -o practica main/main.o encabezado/encabezado.o menu/menu.o operaciones/lecturaCSV/lectura.o operaciones/lecturaCSV/lecturaArchivo.o operaciones/BubbleSort/bubbleSort.o
+aarch64-linux-gnu-as -o operaciones/lecturaCSV/lecturaConsola.o operaciones/lecturaCSV/lecturaConsola.s
+aarch64-linux-gnu-ld -o practica main/main.o encabezado/encabezado.o menu/menu.o operaciones/lecturaCSV/lectura.o operaciones/lecturaCSV/lecturaArchivo.o operaciones/lecturaCSV/lecturaConsola.o operaciones/BubbleSort/bubbleSort.o  operaciones/InsertationSort/insertioSort.o
 qemu-aarch64 ./practica
 
 qemu-aarch64 -g 12345 ./practica
