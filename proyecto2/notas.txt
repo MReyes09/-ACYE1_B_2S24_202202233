@@ -1,0 +1,36 @@
+cd /home/mati/ARM64/proyecto2
+aarch64-linux-gnu-as -o mensajes/mensajes.o mensajes/mensajes.s
+aarch64-linux-gnu-as -o variables/variables.o variables/variables.s
+aarch64-linux-gnu-as -o encabezado/encabezado.o encabezado/encabezado.s
+aarch64-linux-gnu-as -o main/main.o main/main.s
+
+aarch64-linux-gnu-as -o funciones/excel.o funciones/excel.s
+aarch64-linux-gnu-as -o funciones/findComand.o funciones/findComand.s
+aarch64-linux-gnu-as -o funciones/reutilizables.o funciones/reutilizables.s
+
+aarch64-linux-gnu-as -o funciones/importcmp/importCMP.o funciones/importcmp/importCMP.s
+
+aarch64-linux-gnu-as -o funciones/guardarcmp/guardarCMP.o funciones/guardarcmp/guardarCMP.s
+
+aarch64-linux-gnu-as -o funciones/aritmeticas/suma.o funciones/aritmeticas/suma.s
+aarch64-linux-gnu-as -o funciones/aritmeticas/resta.o funciones/aritmeticas/resta.s
+aarch64-linux-gnu-as -o funciones/aritmeticas/multiplicacion.o funciones/aritmeticas/multiplicacion.s
+aarch64-linux-gnu-as -o funciones/aritmeticas/dividir.o funciones/aritmeticas/dividir.s
+aarch64-linux-gnu-as -o funciones/aritmeticas/potencia.o funciones/aritmeticas/potencia.s
+
+aarch64-linux-gnu-as -o funciones/logicas/ologico.o funciones/logicas/ologico.s
+aarch64-linux-gnu-as -o funciones/logicas/andlogico.o funciones/logicas/andlogico.s
+aarch64-linux-gnu-as -o funciones/logicas/oxlogico.o funciones/logicas/oxlogico.s
+
+aarch64-linux-gnu-ld -o practica mensajes/mensajes.o variables/variables.o main/main.o encabezado/encabezado.o funciones/excel.o funciones/findComand.o funciones/reutilizables.o funciones/importcmp/importCMP.o funciones/guardarcmp/guardarCMP.o funciones/aritmeticas/suma.o funciones/aritmeticas/resta.o funciones/aritmeticas/multiplicacion.o funciones/aritmeticas/dividir.o funciones/aritmeticas/potencia.o funciones/logicas/ologico.o funciones/logicas/andlogico.o funciones/logicas/oxlogico.o
+qemu-aarch64 ./practica
+
+qemu-aarch64 -g 12345 ./practica
+
+gdb-multiarch -q --nh -ex 'set architecture aarch64' -ex 'file $practica' -ex 'target remote localhost:12345' -ex 'layout split' -ex 'layout regs';
+
+stepi
+
+
+break etiqueta
+continue
