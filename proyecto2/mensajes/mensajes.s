@@ -9,7 +9,8 @@
 .global cmdSuma, cmdsepY, errorSuma, lenErrorSuma, lenErrorResta, errorMultiplicacion, cmdMultiplicacion, lenErrorMultiplicacion
 .global cmdDivicion, errorDivicion, lenErrorDivicion, divicionCero, lenDivicionCero, cmdsepEntre
 .global cmdPotencia, errorPotencia, lenErrorPotencia, cmdsepALa, errorPotenciaNegativa, lenErrorPotenciaNegativa
-.global cmdOrLogico, cmdAndLogico, cmdOXLogico
+.global cmdOrLogico, cmdAndLogico, cmdOXLogico, cmdNoLogico, cmdLLenarDesde
+.global cmdPromedio, cmdMinimo, cmdMaximo
 // DECLARACION DE VARIABLES QUE GUARDAN LOS MENSAJES A MOSTRAR EN PANTALLA
 .data 
 
@@ -165,4 +166,17 @@ separadorComandoError:
     .asciz " || Separador invalido para el comando utilizado\n"
     lenSeparadorComandoError = .- separadorComandoError
 
+cmdNoLogico:
+    .asciz "NOLOGICO"
 
+cmdLLenarDesde:
+    .asciz "LLENAR DESDE"
+
+cmdPromedio:
+    .asciz "PROMEDIO DESDE"
+
+cmdMinimo:
+    .asciz "MINIMO DESDE"
+
+cmdMaximo:
+    .asciz "MAXIMO DESDE"   

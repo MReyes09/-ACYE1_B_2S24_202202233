@@ -21,8 +21,14 @@ aarch64-linux-gnu-as -o funciones/aritmeticas/potencia.o funciones/aritmeticas/p
 aarch64-linux-gnu-as -o funciones/logicas/ologico.o funciones/logicas/ologico.s
 aarch64-linux-gnu-as -o funciones/logicas/andlogico.o funciones/logicas/andlogico.s
 aarch64-linux-gnu-as -o funciones/logicas/oxlogico.o funciones/logicas/oxlogico.s
+aarch64-linux-gnu-as -o funciones/logicas/nologico.o funciones/logicas/nologico.s
 
-aarch64-linux-gnu-ld -o practica mensajes/mensajes.o variables/variables.o main/main.o encabezado/encabezado.o funciones/excel.o funciones/findComand.o funciones/reutilizables.o funciones/importcmp/importCMP.o funciones/guardarcmp/guardarCMP.o funciones/aritmeticas/suma.o funciones/aritmeticas/resta.o funciones/aritmeticas/multiplicacion.o funciones/aritmeticas/dividir.o funciones/aritmeticas/potencia.o funciones/logicas/ologico.o funciones/logicas/andlogico.o funciones/logicas/oxlogico.o
+aarch64-linux-gnu-as -o funciones/rangos/llenarDesde.o funciones/rangos/llenarDesde.s
+aarch64-linux-gnu-as -o funciones/rangos/promedio.o funciones/rangos/promedio.s
+aarch64-linux-gnu-as -o funciones/rangos/minimo.o funciones/rangos/minimo.s
+aarch64-linux-gnu-as -o funciones/rangos/maximo.o funciones/rangos/maximo.s
+
+aarch64-linux-gnu-ld -o practica mensajes/mensajes.o variables/variables.o main/main.o encabezado/encabezado.o funciones/excel.o funciones/findComand.o funciones/reutilizables.o funciones/importcmp/importCMP.o funciones/guardarcmp/guardarCMP.o funciones/aritmeticas/suma.o funciones/aritmeticas/resta.o funciones/aritmeticas/multiplicacion.o funciones/aritmeticas/dividir.o funciones/aritmeticas/potencia.o funciones/logicas/ologico.o funciones/logicas/andlogico.o funciones/logicas/oxlogico.o funciones/logicas/nologico.o funciones/rangos/llenarDesde.o funciones/rangos/promedio.o funciones/rangos/minimo.o funciones/rangos/maximo.o
 qemu-aarch64 ./practica
 
 qemu-aarch64 -g 12345 ./practica

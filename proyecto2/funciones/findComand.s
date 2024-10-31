@@ -11,6 +11,8 @@
 .extern Proc_ORLogico
 .extern Proc_ANDLogico
 .extern Proc_XORLogico
+.extern Proc_NOTLogico
+.extern Proc_LlenarDesde, Proc_Promedio, Proc_Minimo, Proc_Maximo
 
 .text
 
@@ -74,6 +76,26 @@ findComand:
     LDR x0, =cmdOXLogico
     BL cmpComand
     CBNZ x0, Proc_XORLogico
+
+    LDR x0, =cmdNoLogico
+    BL cmpComand
+    CBNZ x0, Proc_NOTLogico
+
+    LDR x0, =cmdLLenarDesde
+    BL cmpComand
+    CBNZ x0, Proc_LlenarDesde
+
+    LDR x0, =cmdPromedio
+    BL cmpComand
+    CBNZ x0, Proc_Promedio
+
+    LDR x0, =cmdMinimo
+    BL cmpComand
+    CBNZ x0, Proc_Minimo
+
+    LDR x0, =cmdMaximo
+    BL cmpComand
+    CBNZ x0, Proc_Maximo
 
     // Si ningún comando es igual, se imprime un mensaje de error
     LDR x27, =comandoErroneo
